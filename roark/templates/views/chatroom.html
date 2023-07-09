@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <form id="loginform">
+        <input name="username" id="username" placeholder="Username">
+        <button type="submit">Login</button>
+    </form>
+
+    <div id="chatroom" style="display: none;">
+        <p><span class="server">Server</span>: Please keep the chat polite!</p>
+    </div>
+    <form id="chatform" style="display: none;">
+        <input name="message" id="message" placeholder="Message">
+        <button type="submit">Roark!</button>
+    </form>
+{% endblock %}
