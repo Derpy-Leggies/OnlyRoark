@@ -294,3 +294,4 @@ cython_debug/
 
 .webassets-cache/
 /static/gen/
+uploads/*

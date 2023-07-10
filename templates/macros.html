@@ -1,0 +1,11 @@
+{% macro make_message(data, small=False) %}
+    <div class="message {% if small %}small{% endif %}" data-id="{{ data.users.id }}">
+        <img src="/static/images/pfp.jpg" class="pfp">
+        <span class="info">{{ data.users.username }} | {{ data.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+        {% if data.type == "text" %}
+            <p class="content">{{ data.content }}</p>
+        {% elif data.type == "image" %}
+            <img class="content" src="{{ url_for('static', filename='uploads/' + data.content) }}">
+        {% endif %}
+    </div>
+{% endmacro %}
