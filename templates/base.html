@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Funny chat</title>
+
+    {% if current_user.is_authenticated %}
+        <script
+            src="https://cdn.socket.io/4.6.0/socket.io.min.js"
+            integrity="sha384-c79GN5VsunZvi+Q/WObgk2in0CbZsHnjEqvFxC5DxHn9lTfNce2WW6h2pH6u/kF+"
+            crossorigin="anonymous"
+        ></script>
+
+        <script type="text/javascript">
+            const socket = io();
+            socket.connect();
+        </script>
+    {% endif %}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap">
+
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    {% assets "styles" %}
+        <link rel="stylesheet" href="{{ ASSET_URL }}" type="text/css">
+    {% endassets %}
+</head>
+<body>
+    {% block content %}{% endblock %}
+</body>
+{% if current_user.is_authenticated %}
+    {% assets "js" %}
+        <script src="{{ ASSET_URL }}"></script>
+    {% endassets %}
+{% endif %}
+</html>

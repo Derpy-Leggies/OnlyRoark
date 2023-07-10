@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="userlist">
+        {% for user in users %}
+            <p id="{{ user.id }}">{{ user.username }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="chatroom">
+        <div class="nav"><p>/OnlyRoark</p></div>
+
+        <div class="messages"></div>
+
+        <form id="chatform">
+            <input name="message" id="message" placeholder="Message...">
+            <button type="submit">Roark! <i class="ph ph-paper-plane-right"></i></button>
+        </form>
+    </div>
+{% endblock %}

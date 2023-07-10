@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>OnlyRoark</h1>
+
+    <form id="loginForm" action="{{ url_for('auth.login') }}" method="post">
+        <input name="username" id="username" placeholder="Username">
+        <input name="password" id="password" placeholder="Password" type="password">
+        <button type="submit">Login</button>
+    </form>
+
+    <form id="registerForm" action="{{ url_for('auth.register') }}" method="post">
+        <input name="username" id="username" placeholder="Username">
+        <input name="password" id="password" placeholder="Password" type="password">
+        <input name="confirm" id="confirm" placeholder="Confirm" type="password">
+        <button type="submit">Register</button>
+    </form>
+{% endblock %}
