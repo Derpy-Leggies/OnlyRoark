@@ -14,6 +14,9 @@
         <script type="text/javascript">
             const socket = io();
             socket.connect();
+
+            // "global" variables
+            let scroll = 0;
         </script>
     {% endif %}
 
@@ -23,16 +26,20 @@
 
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
-    {% assets "styles" %}
-        <link rel="stylesheet" href="{{ ASSET_URL }}" type="text/css">
-    {% endassets %}
+    {% assets "styles" %}<link rel="stylesheet" href="{{ ASSET_URL }}" type="text/css">{% endassets %}
 </head>
+
 <body>
-    {% block content %}{% endblock %}
+    <aside>
+        {% block aside %}{% endblock %}
+    </aside>
+    <main>
+        <header>{% block header %}<p>OnlyRoark</p>{% endblock %}</header>
+        {% block main %}<p>Nothing to see!</p>{% endblock %}
+    </main>
 </body>
+
 {% if current_user.is_authenticated %}
-    {% assets "js" %}
-        <script src="{{ ASSET_URL }}"></script>
-    {% endassets %}
+    {% assets "js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
 {% endif %}
 </html>

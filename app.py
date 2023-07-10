@@ -27,7 +27,7 @@ js = Bundle(
 )
 styles = Bundle(
     "sass/styles.sass",
-    filters="libsass, cssmin",
+    filters="libsass",
     output="gen/styles.css",
     depends="sass/*.sass",
 )

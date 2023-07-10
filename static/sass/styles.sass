@@ -1,14 +1,10 @@
-$background: rgb(43, 43, 43)
-$background-alt: rgba(43, 43, 43, 0.8)
-$text: rgb(232, 227, 227)
+$background: #261f1b
+$text: #f0e7e4
+$accent: #f2672c
 
-$primary: rgb(178, 119, 50)
-$accent: rgb(44, 142, 150)
+$border: rgba($text, 0.2)
 
-$border: rgba(232, 227, 227, 0.2)
-$background-dark: rgb(28, 28, 28)
-
-$radius: 0.4rem
+$radius: 0.6rem
 $blur: 0.5rem
 
 $font: 'IBM Plex Mono', monospace
@@ -79,11 +75,11 @@ form
     align-items: center
     gap: 0.2rem
 
-    background-color: $background-alt
+    background-color: rgba($background, 0.5)
     backdrop-filter: blur($blur)
 
 
-.userlist
+aside
     grid-area: userlist
     width: 100%
 
@@ -94,7 +90,7 @@ form
     align-items: flex-start
     justify-content: flex-start
 
-    background: $background-dark
+    background: lighten($background, 2%)
 
     > p
         margin: 0.5rem 1rem

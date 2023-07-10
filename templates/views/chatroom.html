@@ -1,30 +1,26 @@
 {% extends 'base.html' %}
 {% from 'macros.html' import make_message %}
 
-{% block content %}
-    <div class="userlist">
-        {% for user in users %}
-            <p id="{{ user.id }}">{{ user.username }}</p>
-        {% endfor %}
-    </div>
+{% block aside %}
+    {% for user in users %}
+        <p id="{{ user.id }}">{{ user.username }}</p>
+    {% endfor %}
+{% endblock %}
 
-    <div class="chatroom">
-        <div class="nav"><p>/OnlyRoark</p></div>
+{% block main %}
+    <div class="messages"></div>
 
-        <div class="messages"></div>
+    <form id="chatform">
+        <button class="btn file">
+            <i class="ph ph-image"></i>
+            <input type="file" id="file" name="file[]" accept="image/*" class="btn icon" multiple>
+        </button>
 
-        <form id="chatform">
-            <button class="btn file">
-                <i class="ph ph-image"></i>
-                <input type="file" id="file" name="file" accept="image/*" class="btn icon">
-            </button>
+        <input name="message" id="message" placeholder="Message..." class="text" autocomplete="off" autofocus>
 
-            <input name="message" id="message" placeholder="Message..." class="text">
-
-            <button type="submit" class="btn">
-                <!--<span>Roark!</span>-->
-                <i class="ph ph-paper-plane-right"></i>
-            </button>
-        </form>
-    </div>
+        <button type="submit" class="btn">
+            <!--<span>Roark!</span>-->
+            <i class="ph ph-paper-plane-right"></i>
+        </button>
+    </form>
 {% endblock %}

@@ -1,12 +1,34 @@
-from flask import Blueprint, render_template, request, jsonify, abort
+from flask import Blueprint, render_template, request, jsonify, send_from_directory, abort
 from flask_login import login_required, current_user
 from extensions import db
-from models import Messages, Users
+from models import Messages, Users, Attachments
 from events import socketio
 from werkzeug.utils import secure_filename
+from uuid import uuid4
+import os
+from config import UPLOADS_FOLDER
+from utils.generate_image import generate_thumbnail
 
 
 blueprint = Blueprint('views', __name__)
+
+
+def format_response(data):
+    message_content = {
+        'id': data.id,
+        'username': data.users.username,
+        'message': data.message,
+        'created_at': data.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+    }
+
+    attachment_content = []
+    for attachment in data.attachment:
+        attachment_content.append({
+            'file_name': attachment.file_name,
+            'file_type': attachment.file_type,
+        })
+
+    return {'message': message_content, 'attachment': attachment_content}
 
 
 @blueprint.route('/', methods=['GET'])
@@ -16,61 +38,70 @@ def index():
     return render_template('views/chatroom.html', users=users)
 
 
+@blueprint.route('/uploads/<path:file_name>', methods=['GET'])
+@login_required
+def uploads(file_name):
+    res = request.args.get("r", default=None, type=str)
+    ext = request.args.get("e", default=None, type=str)
+
+    # if no args are passed, return the raw file
+    if not res and not ext:
+        if not os.path.exists(os.path.join(UPLOADS_FOLDER, file_name)):
+            abort(404)
+        return send_from_directory(UPLOADS_FOLDER, file_name)
+
+    # Generate thumbnail, if None is returned a server error occured
+    thumb = generate_thumbnail(file_name, res, ext)
+    if not thumb:
+        abort(500)
+
+    return send_from_directory(os.path.dirname(thumb), os.path.basename(thumb))
+
+
 @blueprint.route('/message', methods=['GET', 'POST'])
 @login_required
 def message_list():
     if request.method == 'POST':
-        message_content = request.form.get('message').strip()
-        file_content = request.files.get('file')
+        message_form = request.form.get('message', '').strip()
+        file_form = request.files.getlist('file[]')
 
-        if file_content:
-            file_name = secure_filename(file_content.filename)
+        new_message = Messages(
+            user_id=current_user.id,
+            message=message_form,
+        )
 
-            new_message = Messages(content=file_name, user_id=current_user.id, type='image')
-            db.session.add(new_message)
-            db.session.commit()
+        print(new_message.message)
 
-            if file_name.split('.')[-1] in ['png', 'jpg', 'jpeg', 'gif']:
-                file_content.save(f'static/uploads/{file_name}')
-            else:
-                abort(400)
+        db.session.add(new_message)
+        db.session.commit()
 
-            content = {
-                'id': new_message.id,
-                'username': current_user.username,
-                'type': 'image',
-                'content': new_message.content,
-                'created_at': new_message.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-            }
+        for file in file_form:
+            file_extension = file.filename.split('.')[-1]
 
-            socketio.emit('new_message', content, broadcast=True)
+            if file_extension.lower() == "jpg":
+                file_extension = "jpeg"
 
-            return ':3'
-        elif message_content:
-            new_message = Messages(content=message_content, user_id=current_user.id, type='text')
-            db.session.add(new_message)
-            db.session.commit()
+            file_name = uuid4().hex + '.' + file_extension
+            original_file_name = secure_filename(file.filename)
 
-            content = {
-                'id': new_message.id,
-                'username': current_user.username,
-                'type': 'text',
-                'content': new_message.content,
-                'created_at': new_message.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-            }
+            db.session.add(Attachments(
+                message_id=new_message.id,
+                original_file_name=original_file_name,
+                file_name=file_name,
+                file_type='image',
+            ))
 
-            socketio.emit('new_message', content, broadcast=True)
+            file.save(f'uploads/{file_name}')
 
-            return ':3'
+        db.session.commit()
+        socketio.emit('new_message', format_response(new_message), broadcast=True)
+        return ':3'
 
-    message_list = Messages.query.order_by(Messages.created_at.desc()).limit(100).all()
+    offset = int(request.args.get('offset', 0))
+    message_list = Messages.query.order_by(Messages.created_at.desc()).offset(offset).limit(50).all()
+
     messages = []
     for message in message_list:
-        messages.append({
-            'id': message.id,
-            'username': message.users.username,
-            'type': message.type,
-            'content': message.content,
-            'created_at': message.created_at.strftime('%Y-%m-%d %H:%M:%S'),
-        })
+        messages.append(format_response(message))
+
     return jsonify(messages)

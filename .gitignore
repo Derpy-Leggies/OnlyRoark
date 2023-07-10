@@ -198,6 +198,7 @@ db.sqlite3-journal
 
 # Flask stuff:
 instance/
+migrations/
 
 # Scrapy stuff:
 .scrapy
@@ -295,3 +296,4 @@ cython_debug/
 .webassets-cache/
 /static/gen/
 uploads/*
+./static/gen/
